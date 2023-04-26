@@ -1,0 +1,284 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("Koren Universal Hub", "Ocean")
+local Tab = Window:NewTab("Main")
+local Section = Tab:NewSection("Subscribe to Koren")
+
+Section:NewSlider("WalkSpeed", "WalkSpeed make you go fast in walking", 500, 0, function(s) -- 500 (MaxValue) | 0 (MinValue)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = s
+end)
+
+Section:NewSlider("Jump Power", "Jump Power make you go higher in jumping", 500, 0, function(JumpPower) -- 500 (MaxValue) | 0 (MinValue)
+    game.Players.LocalPlayer.Character.Humanoid.JumpPower = JumpPower
+end)
+    
+Section:NewToggle("Infinite Jump", "ToggleInfo", function(state)
+    if state then
+        local InfiniteJumpEnabled = true
+        game:GetService("UserInputService").JumpRequest:connect(function()
+            if InfiniteJumpEnabled then
+                game:GetService"Players".LocalPlayer.Character:FindFirstChildOfClass'Humanoid':ChangeState("Jumping")
+            end
+        end)
+    else
+        print("Toggle Off")
+    end
+end)
+
+Section:NewToggle("noclip", "press and u will see", function(state)
+    if state then
+        local Noclip = nil
+        local Clip = nil
+        
+        function noclip()
+            Clip = false
+            local function Nocl()
+                if Clip == false and game.Players.LocalPlayer.Character ~= nil then
+                    for _,v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                        if v:IsA('BasePart') and v.CanCollide and v.Name ~= floatName then
+                            v.CanCollide = false
+                        end
+                    end
+                end
+                wait(0.21) -- basic optimization
+            end
+            Noclip = game:GetService('RunService').Stepped:Connect(Nocl)
+        end
+        
+        function clip()
+            if Noclip then Noclip:Disconnect() end
+            Clip = true
+        end
+        
+        noclip() -- to toggle noclip() and clip()
+    else
+        clip()
+    end
+end)
+
+Section:NewButton("TP Script", "A Tool that make u teleport", function()
+    mouse = game.Players.LocalPlayer:GetMouse()
+    tool = Instance.new("Tool")
+    tool.RequiresHandle = false
+    tool.Name = "Equip to Click TP"
+    tool.Activated:connect(function()
+    local pos = mouse.Hit+Vector3.new(0,2.5,0)
+    pos = CFrame.new(pos.X,pos.Y,pos.Z)
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = pos
+    end)
+    tool.Parent = game.Players.LocalPlayer.Backpack
+end)
+
+Section:NewButton("Btool", "A Tool that make you delete staff in game", function()
+    Instance.new("HopperBin", game.Players.LocalPlayer.Backpack).BinType = 4
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 20
+end)
+
+Section:NewButton("RTX Script", "Will make u do rtx graghics", function()
+    local light = game.Lighting
+    for i, v in pairs(light:GetChildren()) do
+        v:Destroy()
+    end
+     
+    local ter = workspace.Terrain
+    local color = Instance.new("ColorCorrectionEffect")
+    local bloom = Instance.new("BloomEffect")
+    local sun = Instance.new("SunRaysEffect")
+    local blur = Instance.new("BlurEffect")
+     
+    color.Parent = light
+    bloom.Parent = light
+    sun.Parent = light
+    blur.Parent = light
+     
+    -- enable or disable shit
+     
+    local config = {
+     
+        Terrain = true;
+        ColorCorrection = true;
+        Sun = true;
+        Lighting = true;
+        BloomEffect = true;
+     
+    }
+     
+    -- settings {
+     
+    color.Enabled = false
+    color.Contrast = 0.15
+    color.Brightness = 0.1
+    color.Saturation = 0.25
+    color.TintColor = Color3.fromRGB(255, 222, 211)
+     
+    bloom.Enabled = false
+    bloom.Intensity = 0.1
+     
+    sun.Enabled = false
+    sun.Intensity = 0.2
+    sun.Spread = 1
+     
+    bloom.Enabled = false
+    bloom.Intensity = 0.05
+    bloom.Size = 32
+    bloom.Threshold = 1
+     
+    blur.Enabled = false
+    blur.Size = 6
+     
+    -- settings }
+     
+     
+    if config.ColorCorrection then
+        color.Enabled = true
+    end
+     
+     
+    if config.Sun then
+        sun.Enabled = true
+    end
+     
+     
+    if config.Terrain then
+        -- settings {
+        ter.WaterColor = Color3.fromRGB(10, 10, 24)
+        ter.WaterWaveSize = 0.1
+        ter.WaterWaveSpeed = 22
+        ter.WaterTransparency = 0.9
+        ter.WaterReflectance = 0.05
+        -- settings }
+    end
+     
+     
+    if config.Lighting then
+        -- settings {
+        light.Ambient = Color3.fromRGB(0, 0, 0)
+        light.Brightness = 4
+        light.ColorShift_Bottom = Color3.fromRGB(0, 0, 0)
+        light.ColorShift_Top = Color3.fromRGB(0, 0, 0)
+        light.ExposureCompensation = 0
+        light.FogColor = Color3.fromRGB(132, 132, 132)
+        light.GlobalShadows = true
+        light.OutdoorAmbient = Color3.fromRGB(112, 117, 128)
+        light.Outlines = false
+        -- settings }
+    end
+end)
+
+Section:NewButton("invisible", "ButtonInfo", function()
+    local offset = 1100
+    local invisible = game.Players.LocalPlayer
+    local grips = {}
+    local heldTool
+    local gripChanged
+    local handle
+    local weld
+    function setDisplayDistance(distance)
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player.Character and player.Character:FindFirstChildWhichIsA("Humanoid") then
+                player.Character:FindFirstChildWhichIsA("Humanoid").NameDisplayDistance = distance
+                player.Character:FindFirstChildWhichIsA("Humanoid").HealthDisplayDistance = distance
+            end
+        end
+    end
+    local tool = Instance.new("Tool", game.Players.LocalPlayer.Backpack)
+    tool.Name = "Invisible"
+    tool.RequiresHandle = false
+    tool.CanBeDropped = false
+    tool.Equipped:Connect(
+        function()
+            wait()
+            if not invisible then
+                invisible = true
+                tool.Name = "Enabled Invisible"
+                if handle then
+                    handle:Destroy()
+                end
+                if weld then
+                    weld:Destroy()
+                end
+                handle = Instance.new("Part", workspace)
+                handle.Name = "Handle"
+                handle.Transparency = 1
+                handle.CanCollide = false
+                handle.Size = Vector3.new(2, 1, 1)
+                weld = Instance.new("Weld", handle)
+                weld.Part0 = handle
+                weld.Part1 = game.Players.LocalPlayer.Character.HumanoidRootPart
+                weld.C0 = CFrame.new(0, offset - 1.5, 0)
+                setDisplayDistance(offset + 100)
+                workspace.CurrentCamera.CameraSubject = handle
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, offset, 0)
+                game.Players.LocalPlayer.Character.Humanoid.HipHeight = offset
+                game.Players.LocalPlayer.Character.Humanoid:ChangeState(11)
+                for _, child in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+                    if child:IsA("Tool") and child ~= tool then
+                        grips[child] = child.Grip
+                    end
+                end
+            elseif invisible then
+                invisible = false
+                tool.Name = "Disabled Invisible"
+                if handle then
+                    handle:Destroy()
+                end
+                if weld then
+                    weld:Destroy()
+                end
+                for _, child in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                    if child:IsA("Tool") then
+                        child.Parent = game.Players.LocalPlayer.Backpack
+                    end
+                end
+                for tool, grip in pairs(grips) do
+                    if tool then
+                        tool.Grip = grip
+                    end
+                end
+                heldTool = nil
+                setDisplayDistance(100)
+                workspace.CurrentCamera.CameraSubject = game.Players.LocalPlayer.Character.Humanoid
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, -offset, 0)
+                game.Players.LocalPlayer.Character.Humanoid.HipHeight = 0
+            end
+            tool.Parent = game.Players.LocalPlayer.Backpack
+        end
+    )
+    game.Players.LocalPlayer.Character.ChildAdded:Connect(
+        function(child)
+            wait()
+            if invisible and child:IsA("Tool") and child ~= heldTool and child ~= tool then
+                heldTool = child
+                local lastGrip = heldTool.Grip
+                if not grips[heldTool] then
+                    grips[heldTool] = lastGrip
+                end
+                for _, track in pairs(game.Players.LocalPlayer.Character.Humanoid:GetPlayingAnimationTracks()) do
+                    track:Stop()
+                end
+                game.Players.LocalPlayer.Character.Animate.Disabled = true
+                heldTool.Grip = heldTool.Grip * (CFrame.new(0, offset - 1.5, 1.5) * CFrame.Angles(math.rad(-90), 0, 0))
+                heldTool.Parent = game.Players.LocalPlayer.Backpack
+                heldTool.Parent = game.Players.LocalPlayer.Character
+                if gripChanged then
+                    gripChanged:Disconnect()
+                end
+                gripChanged =
+                    heldTool:GetPropertyChangedSignal("Grip"):Connect(
+                    function()
+                        wait()
+                        if not invisible then
+                            gripChanged:Disconnect()
+                        end
+                        if heldTool.Grip ~= lastGrip then
+                            lastGrip =
+                                heldTool.Grip * (CFrame.new(0, offset - 1.5, 1.5) * CFrame.Angles(math.rad(-90), 0, 0))
+                            heldTool.Grip = lastGrip
+                            heldTool.Parent = game.Players.LocalPlayer.Backpack
+                            heldTool.Parent = game.Players.LocalPlayer.Character
+                        end
+                    end
+                )
+            end
+        end
+    )
+end)
